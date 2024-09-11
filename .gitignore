@@ -21,7 +21,6 @@
 
 # Archivos grandes o generados
 *.csv
-*.parquet
 *.ipynb
 
 # Archivos de respaldo
