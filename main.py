@@ -12,9 +12,9 @@ if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
     
     
-df_peliculas = pd.read_parquet("C:/Users/jugas/Proyecto/proyecto/data/info_peliculas.parquet")
-df_reparto = pd.read_parquet("C:/Users/jugas/Proyecto/proyecto/data/reparto.parquet")
-df_equipo = pd.read_parquet("C:/Users/jugas/Proyecto/proyecto/data/equipo_produccion.parquet")
+df_peliculas = pd.read_parquet("proyecto/data/info_peliculas.parquet")
+df_reparto = pd.read_parquet("proyecto/data/reparto.parquet")
+df_equipo = pd.read_parquet("proyecto/data/equipo_produccion.parquet")
         
 
 #Instancio la clase 
