@@ -6,13 +6,14 @@ from fastapi.responses import HTMLResponse
 from enum import Enum
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from express import require
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
     
 const express = require('express')
 const app = express()
-const port = process.env.PORT || 4000
+const port = process.env.PORT || 10000
     
 df_peliculas = pd.read_parquet("C:/Users/jugas/Proyecto/proyecto/data/info_peliculas.parquet")
 df_reparto = pd.read_parquet("C:/Users/jugas/Proyecto/proyecto/data/reparto.parquet")
