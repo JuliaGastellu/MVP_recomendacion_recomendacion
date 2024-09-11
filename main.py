@@ -14,9 +14,9 @@ if __name__ == "__main__":
 app = express()
 port = process.env.PORT or 10000
     
-df_peliculas = pd.read_parquet("C:/Users/jugas/Proyecto/proyecto/data/info_peliculas.parquet")
-df_reparto = pd.read_parquet("C:/Users/jugas/Proyecto/proyecto/data/reparto.parquet")
-df_equipo = pd.read_parquet("C:/Users/jugas/Proyecto/proyecto/data/equipo_produccion.parquet")
+df_peliculas = pd.read_parquet("proyecto/data/info_peliculas.parquet")
+df_reparto = pd.read_parquet("proyecto/data/reparto.parquet")
+df_equipo = pd.read_parquet("proyecto/data/equipo_produccion.parquet")
         
 
 #Instancio la clase 
