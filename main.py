@@ -10,6 +10,10 @@ from sqlalchemy.orm import sessionmaker
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
     
+const express = require('express')
+const app = express()
+const port = process.env.PORT || 4000
+    
 df_peliculas = pd.read_parquet("C:/Users/jugas/Proyecto/proyecto/data/info_peliculas.parquet")
 df_reparto = pd.read_parquet("C:/Users/jugas/Proyecto/proyecto/data/reparto.parquet")
 df_equipo = pd.read_parquet("C:/Users/jugas/Proyecto/proyecto/data/equipo_produccion.parquet")
@@ -145,4 +149,6 @@ async def nombre_e_info_director(nombre_director: str):
 
 
 
-
+app.listen(port, () => {
+  console.log("Example app listening on port ${port}");
+})
