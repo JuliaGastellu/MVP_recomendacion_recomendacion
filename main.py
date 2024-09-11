@@ -11,8 +11,6 @@ from express import require
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
     
-app = express()
-port = process.env.PORT or 10000
     
 df_peliculas = pd.read_parquet("C:/Users/jugas/Proyecto/proyecto/data/info_peliculas.parquet")
 df_reparto = pd.read_parquet("C:/Users/jugas/Proyecto/proyecto/data/reparto.parquet")
@@ -149,5 +147,4 @@ async def nombre_e_info_director(nombre_director: str):
 
 
 
-app.run(port=port)
-print(f"Example app listening on port {port}")
+
