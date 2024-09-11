@@ -1,0 +1,28 @@
+# Archivos temporales de sistema operativo
+/tmp
+/.DS_Store
+
+# Archivos de caché
+/node_modules
+/.cache
+
+# Archivos de entorno
+.env
+.env.*
+
+# Archivos de salida
+/dist
+/build
+*.log
+
+# Archivos de configuración específicos del IDE
+.idea
+.vscode
+
+# Archivos grandes o generados
+*.csv
+*.parquet
+*.ipynb
+
+# Archivos de respaldo
+*.swp
