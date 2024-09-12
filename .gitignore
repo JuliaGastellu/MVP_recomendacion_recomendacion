@@ -21,7 +21,6 @@
 
 # Archivos grandes o generados
 *.csv
-*.ipynb
 
 # Archivos de respaldo
 *.swp
