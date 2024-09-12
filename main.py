@@ -13,8 +13,8 @@ if __name__ == "__main__":
     
     
 df_peliculas = pd.read_parquet("proyecto/data/info_peliculas.parquet")
-df_reparto = pd.read_parquet("proyecto/data/reparto.parquet")
-df_equipo = pd.read_parquet("proyecto/data/equipo_produccion.parquet")
+df_reparto = pd.read_parquet("proyecto/data/data_actor.parquet")
+df_equipo = pd.read_parquet("proyecto/data/data_director.parquet")
         
 
 #Instancio la clase 
@@ -107,43 +107,56 @@ async def votos_titulo(titulo: str):
             # En caso de que la cantidad de votos sea menor a 2000
             return f"La película {titulo} no cumple con la condición de tener al menos 2000 valoraciones"
         
-#5 Ruta para obtener información de un director
-@app.get("/nombre_e_info_director/{nombre_actor}", name="Información de actor")
-async def nombre_e_info_actor(nombre_actor: str):
-    """
-    Se ingresa el nombre de un actor, por ejemplo "Jack Black"
-    """
-
-    actor_data = df_reparto[df_reparto['name'].str.contains(nombre_actor, case=False, na=False)]
-   
-
-    if actor_data.empty:
-        raise HTTPException(status_code=404, detail="Actor/actriz no encontrado.")
 
 
+#5 Ruta para obtener información de un actor
+
+@app.get("/get_actor/{nombre_actor}", name="Información de actor")
+async def get_actor(nombre_actor: str):
+    '''Se ingresa el nombre de un actor, por ejemplo "Joe Roberts" y se retorna su éxito medido a través del retorno, cantidad de películas y promedio de retorno.'''
+
+    
+    actor = df_reparto[df_reparto['name'] == nombre_actor]
+
+    if actor.empty:
+        raise HTTPException(status_code=404, detail="Actor no encontrado.")
+
+    # Calcular métricas solo para el actor encontrado
+    total_retorno = actor['return'].sum()
+    cantidad_peliculas = actor.shape[0]
+    promedio_retorno = actor['return'].mean()
 
     return {
-        "Actor/actriz": nombre_actor}
-
-
+        "Actor/Actriz": nombre_actor,
+        "Cantidad de películas": cantidad_peliculas,
+        "Retorno Total": total_retorno,
+        "Retorno Promedio": promedio_retorno
+    }
 
 #6 Ruta para obtener información de un director
-@app.get("/nombre_e_info_director/{nombre_director}", name="Información de director")
-async def nombre_e_info_director(nombre_director: str):
-    """
-    Se ingresa el nombre de un director, por ejemplo "Quentin Tarantino"
-    """
 
-    director_data = df_equipo[df_equipo['name'].str.contains(nombre_director, case=False, na=False)]
-   
-
-    if director_data.empty:
-        raise HTTPException(status_code=404, detail="Director/a no encontrado.")
-
-
-
+@app.get("/get_director/{nombre_director}", name="Información de director")
+async def get_director(nombre_director: str):
+    '''Se ingresa el nombre de un director y se retorna su éxito medido a través del retorno, nombre de cada película, fecha de lanzamiento, retorno individual, costo y ganancia.'''
+    director = df_equipo[df_equipo['name'].str.contains(nombre_director, case=False, na=False)].drop_duplicates(subset=['name', 'title'])
+    if director.empty:
+        raise HTTPException(status_code=404, detail="Director no encontrado.")
+    resultado = []
+    for index, row in director.iterrows():
+        resultado.append({
+            "Título de la película": row['title'],
+            "Fecha de lanzamiento": row['release_date'],
+            "Retorno": row['return'],
+            "Presupuesto": row['budget'],
+            "Ganancia": row['revenue']
+        })
+    total_retorno = director['return'].sum()
     return {
-        "Director/a": nombre_director}
+        "Director": nombre_director,
+        "Retorno Total": total_retorno,
+        "Películas": resultado
+    }
+
 
 
 
