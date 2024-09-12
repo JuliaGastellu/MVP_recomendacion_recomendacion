@@ -105,7 +105,7 @@ async def votos_titulo(titulo: str):
             }
         else:
             # En caso de que la cantidad de votos sea menor a 2000
-            return f"La película {titulo} no cumple con la condición de tener al menos 2000 valoraciones "
+            return f"La película {titulo} no cumple con la condición de tener al menos 2000 valoraciones"
         
 #5 Ruta para obtener información de un director
 @app.get("/nombre_e_info_director/{nombre_actor}", name="Información de actor")
