@@ -6,6 +6,7 @@ from fastapi.responses import HTMLResponse
 from enum import Enum
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+import unicodedata
 
 
 if __name__ == "__main__":
@@ -135,29 +136,51 @@ async def get_actor(nombre_actor: str):
 
 #6 Ruta para obtener información de un director
 
+import unicodedata
+import pandas as pd
+
 @app.get("/get_director/{nombre_director}", name="Información de director")
 async def get_director(nombre_director: str):
-    '''Se ingresa el nombre de un director y se retorna su éxito medido a través del retorno, nombre de cada película, fecha de lanzamiento, retorno individual, costo y ganancia.'''
-    director = df_equipo[df_equipo['name'].str.contains(nombre_director, case=False, na=False)].drop_duplicates(subset=['name', 'title'])
-    if director.empty:
-        raise HTTPException(status_code=404, detail="Director no encontrado.")
-    resultado = []
-    for index, row in director.iterrows():
-        resultado.append({
-            "Título de la película": row['title'],
-            "Fecha de lanzamiento": row['release_date'],
-            "Retorno": row['return'],
-            "Presupuesto": row['budget'],
-            "Ganancia": row['revenue']
-        })
-    total_retorno = director['return'].sum()
-    return {
-        "Director": nombre_director,
-        "Retorno Total": total_retorno,
-        "Películas": resultado
-    }
+    """Se ingresa el nombre de un director y se retorna su éxito medido a través del retorno, nombre de cada película, fecha de lanzamiento, retorno individual, costo y ganancia."""
 
+    # Normalizar ambos nombres a una forma canónica
+    def normalize_name(name):
+        if pd.isna(name):
+            return None  # Manejar valores nulos
+        return unicodedata.normalize('NFKD', name).encode('ascii', 'ignore').decode('utf-8').lower()
 
+    nombre_director_normalizado = normalize_name(nombre_director)
 
+    try:
+        # Filtrar y eliminar duplicados, manejando posibles errores
+        director = df_equipo[df_equipo['name'].apply(normalize_name) == nombre_director_normalizado]
+        director = director.dropna(subset=['name', 'title']).drop_duplicates(subset=['name', 'title'])
 
+        if director.empty:
+            raise HTTPException(status_code=404, detail="Director no encontrado.")
+
+        # Crear una lista con la información de cada película
+        resultados = []
+        for _, row in director.iterrows():
+            resultados.append({
+                "Título de la película": row['title'],
+                "Fecha de lanzamiento": row['release_date'],
+                "Retorno": row['return'],
+                "Presupuesto": row['budget'],
+                "Ganancia": row['revenue']
+            })
+
+        # Calcular el retorno total
+        total_retorno = director['return'].sum()
+
+        # Retornar la información
+        return {
+            "Director": nombre_director,
+            "Retorno Total": total_retorno,
+            "Películas": resultados
+        }
+    except Exception as e:
+        # Capturar todas las excepciones para un manejo más general
+        raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")
+   
 
