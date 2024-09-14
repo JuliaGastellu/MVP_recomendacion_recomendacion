@@ -29,7 +29,7 @@ if __name__ == "__main__":
     
     
 df_peliculas = pd.read_parquet("proyecto/data/info_peliculas.parquet")
-df_modelo = pd.read_parquet("C:/Users/jugas/Proyecto/Proyecto/data/modelo_consulta.parquet")
+df_modelo = pd.read_parquet("proyecto/data/modelo_consulta.parquet")
 
         
 
