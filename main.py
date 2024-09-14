@@ -14,8 +14,7 @@ if __name__ == "__main__":
     
     
 df_peliculas = pd.read_parquet("proyecto/data/info_peliculas.parquet")
-df_reparto = pd.read_parquet("proyecto/data/data_actor.parquet")
-df_equipo = pd.read_parquet("proyecto/data/data_director.parquet")
+
         
 
 #Instancio la clase 
@@ -48,7 +47,7 @@ def cantidad_filmaciones_mes(mes: str):
         return {"mensaje": f"{count} cantidad de películas fueron estrenadas en el mes de {mes.capitalize()}"}
     else:
         return {"mensaje": "Mes inválido"}
-    # Filtrar el DataFrame y contar las películas
+    # Filtro el DataFrame y hago conteo las películas
     cantidad = df_peliculas[df_peliculas['release_date'].dt.month == num_mes].shape[0]
 
     return f"En el mes de {mes} se estrenaron {cantidad} películas"
@@ -73,7 +72,7 @@ def cantidad_filmaciones_dia_semana(dia_semana: str):
     else:
         return {"mensaje": "Día de la semana inválido."}
 
-#3 Ruta de score por título
+#3 Funcion para obtener el score por título
 @app.get("/score_titulo/{titulo}", name="Score por título de película")
 async def score_titulo(titulo: str):
     '''Se ingresa el título de una película, por ejemplo "Titanic", y se retorna el título, el año de estreno y el score.'''
@@ -83,7 +82,7 @@ async def score_titulo(titulo: str):
     resultado = pelicula[['title', 'release_year', 'vote_average']].to_dict(orient='records')[0]
     return {"Título de la película": resultado['title'], "Año": resultado['release_year'], "Puntaje": resultado['vote_average']}
 
-#4 Ruta de votos por título
+#4 Funcion para obtener votos por título
 @app.get("/votos_titulo/{titulo}", name="Votos por título de película")
 async def votos_titulo(titulo: str):
     '''Se ingresa el título de una película, por ejemplo "The Terminator", y se retorna el título, la cantidad de votos y el promedio de votaciones.'''
@@ -94,7 +93,7 @@ async def votos_titulo(titulo: str):
         year_es = int(pelicula["release_year"].iloc[0])
         voto_tot = int(pelicula["vote_count"].iloc[0])
         voto_prom = pelicula["vote_average"].iloc[0]
-        # Retornar el nombre del titulo ubicado en la columna title
+        # Retorna el nombre del titulo ubicado en la columna title
         titulo = pelicula["title"].iloc[0]
         if voto_tot >= 2000:
             # muestra los datos
@@ -110,22 +109,22 @@ async def votos_titulo(titulo: str):
         
 
 
-#5 Ruta para obtener información de un actor
+#5 Funcion para obtener información de un actor
 
 @app.get("/get_actor/{nombre_actor}", name="Información de actor")
 async def get_actor(nombre_actor: str):
     '''Se ingresa el nombre de un actor, por ejemplo "Joe Roberts" y se retorna su éxito medido a través del retorno, cantidad de películas y promedio de retorno.'''
 
-    # Normalizar el nombre de entrada a minúsculas
+    # Normalizo el nombre de entrada a minúsculas
     nombre_actor_minusculas = nombre_actor.lower()
 
-    # Filtrar el DataFrame, normalizando los nombres en el DataFrame también
-    actor = df_reparto[df_reparto['name'].str.lower() == nombre_actor_minusculas]
+    # Filtro el DataFrame, normalizando los nombres en el DataFrame también
+    actor = df_peliculas[df_peliculas['name_actor'].str.lower() == nombre_actor_minusculas]
 
     if actor.empty:
         raise HTTPException(status_code=404, detail="Actor no encontrado.")
 
-    # Calcular métricas solo para el actor encontrado
+    # Calculo métricas solo para el actor encontrado
     total_retorno = actor['return'].sum()
     cantidad_peliculas = actor.shape[0]
     promedio_retorno = actor['return'].mean()
@@ -137,7 +136,7 @@ async def get_actor(nombre_actor: str):
         "Retorno Promedio": promedio_retorno
     }
 
-#6 Ruta para obtener información de un director
+#6 Funcion para obtener información de un director
 
 import unicodedata
 import pandas as pd
@@ -146,23 +145,23 @@ import pandas as pd
 async def get_director(nombre_director: str):
     """Se ingresa el nombre de un director y se retorna su éxito medido a través del retorno, nombre de cada película, fecha de lanzamiento, retorno individual, costo y ganancia."""
 
-    # Normalizar ambos nombres a una forma canónica
+    # Normalizo ambos nombres a una forma canónica
     def normalize_name(name):
         if pd.isna(name):
-            return None  # Manejar valores nulos
+            return None  # Manejo de valores nulos
         return unicodedata.normalize('NFKD', name).encode('ascii', 'ignore').decode('utf-8').lower()
 
     nombre_director_normalizado = normalize_name(nombre_director)
 
     try:
-        # Filtrar y eliminar duplicados, manejando posibles errores
-        director = df_equipo[df_equipo['name'].apply(normalize_name) == nombre_director_normalizado]
-        director = director.dropna(subset=['name', 'title']).drop_duplicates(subset=['name', 'title'])
+        # Filtro y elimino duplicados, manejando posibles errores
+        director = df_peliculas[df_peliculas['name_director'].apply(normalize_name) == nombre_director_normalizado]
+        director = director.dropna(subset=['name_director', 'title']).drop_duplicates(subset=['name_director', 'title'])
 
         if director.empty:
             raise HTTPException(status_code=404, detail="Director no encontrado.")
 
-        # Crear una lista con la información de cada película
+        # Se crea una lista con la información de cada película
         resultados = []
         for _, row in director.iterrows():
             resultados.append({
@@ -173,17 +172,17 @@ async def get_director(nombre_director: str):
                 "Ganancia": row['revenue']
             })
 
-        # Calcular el retorno total
+        # Se calcula el retorno total
         total_retorno = director['return'].sum()
 
-        # Retornar la información
+        # Retorna la información
         return {
             "Director": nombre_director,
             "Retorno Total": total_retorno,
             "Películas": resultados
         }
     except Exception as e:
-        # Capturar todas las excepciones para un manejo más general
+        # Se capturan todas las excepciones para un manejo más general
         raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")
    
 
