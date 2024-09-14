@@ -227,11 +227,8 @@ async def recomendacion(titulo):
     # Crear un índice con todos los títulos en minúsculas
     indices = pd.Series(df_modelo.index, index=df_modelo['title'].str.lower()).drop_duplicates()
 
-    # Resto del código sin cambios
     if titulo not in indices:
         return 'La película ingresada no se encuentra en la base de datos'
-
-    # ... (resto de la función)
 
     # Obtiene el índice de la primera aparición del título
     ind = indices[titulo]
