@@ -116,8 +116,11 @@ async def votos_titulo(titulo: str):
 async def get_actor(nombre_actor: str):
     '''Se ingresa el nombre de un actor, por ejemplo "Joe Roberts" y se retorna su éxito medido a través del retorno, cantidad de películas y promedio de retorno.'''
 
-    
-    actor = df_reparto[df_reparto['name'] == nombre_actor]
+    # Normalizar el nombre de entrada a minúsculas
+    nombre_actor_minusculas = nombre_actor.lower()
+
+    # Filtrar el DataFrame, normalizando los nombres en el DataFrame también
+    actor = df_reparto[df_reparto['name'].str.lower() == nombre_actor_minusculas]
 
     if actor.empty:
         raise HTTPException(status_code=404, detail="Actor no encontrado.")
