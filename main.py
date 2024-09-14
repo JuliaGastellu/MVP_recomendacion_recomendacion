@@ -1,3 +1,5 @@
+#Importo librerías
+
 import uvicorn
 from fastapi import FastAPI, HTTPException, Depends
 import os
@@ -8,12 +10,26 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import unicodedata
 
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+import warnings
+from wordcloud import WordCloud, STOPWORDS
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+import nltk
+nltk.download('punkt')
+nltk.download('stopwords')
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
     
     
 df_peliculas = pd.read_parquet("proyecto/data/info_peliculas.parquet")
+df_modelo = pd.read_parquet("C:/Users/jugas/Proyecto/Proyecto/data/modelo_consulta.parquet")
 
         
 
@@ -186,3 +202,48 @@ async def get_director(nombre_director: str):
         raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")
    
 
+#Machine Learning
+##Se separan los géneros y se convierten en palabras individuales
+df_modelo['genres'] = df_modelo['genres'].fillna('').apply(lambda x: ' '.join(x.replace(',', ' ').replace('-', '').lower().split()))
+
+# Creo una instancia de la clase TfidfVectorizer
+
+Vectorizacion = TfidfVectorizer(stop_words="english", ngram_range=(1, 2))
+
+# Aplico la transformación TF-IDF al texto contenido en las columnas "overview", "genres" y "title" y "original_language"
+matriz_vectorizada = Vectorizacion.fit_transform(df_modelo['overview'] + ' ' + df_modelo['genres'] + ' ' + df_modelo['title'] + ' ' + df_modelo['original_language'])
+
+
+#Función para obtener recomendaciones
+
+
+@app.get('/recomendacion/{titulo}', name = "Sistema de recomendación")
+async def recomendacion(titulo):
+
+
+    # Convertir el título ingresado a minúsculas
+    titulo = titulo.lower()
+
+    # Crear un índice con todos los títulos en minúsculas
+    indices = pd.Series(df_modelo.index, index=df_modelo['title'].str.lower()).drop_duplicates()
+
+    # Resto del código sin cambios
+    if titulo not in indices:
+        return 'La película ingresada no se encuentra en la base de datos'
+
+    # ... (resto de la función)
+
+    # Obtiene el índice de la primera aparición del título
+    ind = indices[titulo]
+
+    # Calcula la similitud coseno
+    cosine_sim = cosine_similarity(matriz_vectorizada[ind], matriz_vectorizada).flatten()
+
+    # Obtiene los índices de las películas más similares
+    simil = sorted(enumerate(cosine_sim), key=lambda x: x[1], reverse=True)[1:6]
+    valid_ind = [i[0] for i in simil if i[0] < len(df_modelo)]
+
+    # Obtiene los títulos de las películas recomendadas
+    recomendaciones = df_modelo.iloc[valid_ind]['title'].tolist()
+
+    return recomendaciones
