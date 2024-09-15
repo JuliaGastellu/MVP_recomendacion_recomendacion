@@ -203,15 +203,14 @@ async def get_director(nombre_director: str):
    
 
 #Machine Learning
-##Se separan los géneros y se convierten en palabras individuales
-df_modelo['genres'] = df_modelo['genres'].fillna('').apply(lambda x: ' '.join(x.replace(',', ' ').replace('-', '').lower().split()))
+
 
 # Creo una instancia de la clase TfidfVectorizer
 
 Vectorizacion = TfidfVectorizer(stop_words="english", ngram_range=(1, 2))
 
-# Aplico la transformación TF-IDF al texto contenido en las columnas "overview", "genres" y "title" y "original_language"
-matriz_vectorizada = Vectorizacion.fit_transform(df_modelo['overview'] + ' ' + df_modelo['genres'] + ' ' + df_modelo['title'] + ' ' + df_modelo['original_language'])
+# Aplico la transformación TF-IDF al texto contenido en la columna de palabras combinadas
+matriz_vectorizada = Vectorizacion.fit_transform(df_modelo['matriz_combinada'])
 
 
 #Función para obtener recomendaciones
