@@ -65,6 +65,11 @@ get_director( nombre_director ): Se ingresa el nombre de un director que se encu
 
 Recomendacion(titulo_de_la_pelicula): Se ingresa el título de una película contenida dentro de la base de datos, y el algoritmo hace una recomendación de otras 5.
 
+## Autora del Proyecto: Julia Gastellu
+
+juliacgastellu@gmail.com
+
+https://www.linkedin.com/in/julia-gastellu/
 
 <h2 align="left">Tecnologías utilizadas en este proyecto:</h2>
 
