@@ -3,18 +3,19 @@
 
 Descripción General
 
-Este proyecto tiene como objetivo desarrollar un sistema de recomendación de películas personalizado, utilizando técnicas de aprendizaje automático. El sistema se basa en un conjunto de datos de películas y calificaciones de usuarios, y emplea un proceso de ETL (Extracción, Transformación y Carga) para preparar los datos para el análisis.
+Este proyecto es parte de una instancia evaluativa que tiene como objetivo desarrollar un MVP basado en una FastApi de consulta, que incluye endpoints para consultar datos específicos de una base de datos de películas y un sistema de recomendación de películas personalizado, utilizando técnicas de aprendizaje automático. 
 
 Estructura del Proyecto
 
 data: Contiene los datos preprocesados y procesados, en formato parquet.
 
-notebooks: Jupyter Notebooks con el código para cada etapa del proyecto:
+notebooks (Jupyter Notebooks con el código para cada etapa del proyecto):
+
 ETL_PI01.ipynb: Limpieza, transformación y carga de los datos en un formato adecuado para el análisis.
 EDA_PI01.ipynb: Análisis exploratorio de datos para comprender las características de los datos y encontrar patrones.
 ML_modelo.ipynb: Desarrollo y entrenamiento de los modelos de recomendación.
 
-main.py: Código para crear una API RESTful para hacer consultas a los datos y solicitar las recomendaciones.
+main.py: Código para crear fastapi para hacer consultas a los datos y solicitar las recomendaciones.
 
 requirements.txt: Lista de las dependencias del proyecto.
 
@@ -22,18 +23,26 @@ Proceso
 
 ETL:
 
-Extracción: A partir de archivos .csv proporcionados para los fines de este proyecto.
-Transformación: Limpiar los datos, desanidar columnas y manejar valores faltantes, normalizar los datos y crear características relevantes (ej., géneros, actores, directores).
-Carga: Cargar los datos en un formato adecuado para el análisis en formato parquet.
+En esta instancia hice el desanidado de las columnas y las transformaciones que se habían propuesto en la consigna, además de desanidar las columnas necesarias en el dataset de credits, hice transformaciones necesarias de datos y eliminé algunas columnas que me resultaban irrelevantes, dejando un solo dataset preliminar concatenando lo que me interesaba de cada uno de los dos archivos csv originales aportados para el proyecto.  
 
 EDA:
 
-Análisis exploratorio: Visualizar la distribución de las calificaciones, la popularidad de las películas, la relación entre géneros y calificaciones, popularidad o el ROI, lo mismo en relación a los lenguajes en que fueron creadas y lanzadas al mercado, la distribución de estrenos a lo largo del tiempo.
-Ingeniería de características: Se analizó la cantidad de palabras contenidas en una nube de palabras utilizando las sinopsis (overviews) correspondientes a las películas que tenían un promedio de votación de usuarios mayor a 7 .
+En el EDA (Análisis exploratorio de datos) comencé inspeccionando los atributos básicos de mi dataset (un dataframe producto de las transformaciones hechas anteriormente en el proceso de ETL incluido en este proyecto) tales como información, tipos de datos, cantidad de valores nulos por columna.
+Decidí eliminar las películas cuyo runtime fuera menor a 50 minutos y mayor a 330 (ya que la columna contenía outliers de duración correspondientes a miniseries y mi sistema de recomendación está basado en películas únicamente).
+Hice un conteo de géneros y los grafiqué para verificar todos los contenidos y su distribución.
+Hice lo mismo con los idiomas originales de las películas decidiendo quedarme con los 10 más frecuentes. 
+Calculé algunas correlaciones pero fueron descartadas por no encontrar nada significativo.
+Luego corregí algunos valores que habían quedado como infinitos dentro del cálculo de return (ROI) y que no resutaban significativos de todas maneras. 
+Decidí eliminar todas las películas estrenadas antes de 1980 por considerar que no tenía sentido incluir en el análisis la valoración de éstas películas por una cuestión generacional, aunque también tomé la decisión para hacer un recorte que me permitiera subsanar las limitaciones técnicas con las que tuve que lidiar, sobretodo con la capa gratuita de Render.
+Eliminé también todas las películas que tuvieran un status diferente a "Released" (es decir, efectivamente estrenadas).
+Incluí en mi análisis una nube de palabras que me mostrara las palabras más frecuentes en las Overviews de aquellas películas que tenían un promedio de votación de 7 o más, que son las que consideré que pertenecían a la categoría con mayor aceptación por parte del público. 
+Finalicé con la eliminación de las columnas que me parecieron irrelevantes para incluir dentro de mi modelo de recomendación, hice un mapa de calor para verificar las correlaciones del dataframe transformado y lo exporté en formato parquet.
 
-Modelado:
 
-Selección del modelo: Se optó por hacer un filtrado basado en contenido, para lo que se utilizó un modelo basado en la similitud del coseno.
+
+Modelo de Recomendación:
+
+Mi función de recomendación está basada en calcular la similitud del coseno correspondiente a los atributos categóricos tales como el género de las películas y las palabras contenidas en las overviews, y sus títulos, previamente tokenizadas, y devuelve 5 películas "recomendadas" por su similitud en relación a esos atributos.
 
 
 
@@ -45,7 +54,7 @@ Desarrollo: Crear una API RESTful utilizando FastAPI para exponer las funcionali
 Endpoints: Los endpoints para la API estaban predefinidos dentro de los requerimientos del MVP.
 
 
-Aplicación desplegada en Render: https://mvp-sistema-recomendacion.onrender.com
+Aplicación desplegada en Render: https://mvp-sistema-recomendacion.onrender.com/docs
 
 
 Funciones en la APP:
@@ -65,13 +74,15 @@ get_director( nombre_director ): Se ingresa el nombre de un director que se encu
 
 Recomendacion(titulo_de_la_pelicula): Se ingresa el título de una película contenida dentro de la base de datos, y el algoritmo hace una recomendación de otras 5.
 
+
 ## Autora del Proyecto: Julia Gastellu
 
 juliacgastellu@gmail.com
 
 https://www.linkedin.com/in/julia-gastellu/
 
-<h2 align="left">Tecnologías utilizadas en este proyecto:</h2>
+
+<h2 align="left">Tecnologías utilizadas:</h2>
 
 ###
 
