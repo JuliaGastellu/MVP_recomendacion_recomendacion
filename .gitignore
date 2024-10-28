@@ -105,3 +105,11 @@ local_settings.py
 *.suo
 *.sln
 *.xcodeproj
+
+# Ignorar archivos comunes
+node_modules/
+*.log
+*.swp
+
+# Ignorar la carpeta Scripts
+Scripts/
