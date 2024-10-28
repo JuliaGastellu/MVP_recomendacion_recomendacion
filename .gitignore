@@ -22,9 +22,6 @@
 # Archivos grandes o generados
 *.csv
 
-# Archivos de respaldo
-*.swp
-
 # Descarte archivos creados por el sistema
 /.idea/
 .vscode/
@@ -42,9 +39,6 @@ dist/
 # Descarte archivos de configuración local
 .env
 .env.*
-
-# Descarte archivos de logs
-logs/
 
 # Descarte archivos de base de datos
 db.sqlite3
@@ -98,7 +92,6 @@ htmlcov/
 
 # Django
 local_settings.py
-
 
 # IDE files
 *.pyproj
